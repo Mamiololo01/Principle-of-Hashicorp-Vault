@@ -425,223 +425,287 @@ The client (in this case, webapp) uses the RoleID and SecretID passed by the adm
 
 Tip
 Refer to the Advanced Features section for further discussion on distributing the RoleID and SecretID to the client app securely.
-CLI command
-API call using cURL
-1. To login, use the auth/approle/login endpoint by passing the RoleID and SecretID.  Note Replace the role_id and secret_id values in the example with those generated in the Generate RoleID and SecretID section above.   Example: $ vault write auth/approle/login \
-2.      role_id="675a50e7-cfe0-be76-e35f-49ec009731ea" \
-3.      secret_id="ed0a642f-2acf-c2da-232f-1b21300d5f29"
-4.      Example output: Key                     Value
-5.  ---                     -----
-6.  token                   hvs.BMXSIJvlm6OjYeWiBmkLxnhgkPAkr3Lx8CbvU1WRnCGTwufIGicKImh2cyDYN0hhaWJIcE5yQUlRWGMxYzZFc05DcDUuWFA1T2oQjQI
-7.  token_accessor          FILPoDWPoqd5zeo62HAoWexN.0YFbA
-8.  token_duration          1h
-9.  token_renewable         true
-10.  token_policies          ["default" "tester"]
-11.  identity_policies       []
-12.  policies                ["default" "tester"]
-13.  token_meta_role_name    webapp
-14.      Vault returns a client token with default and tester policies attached.
-15. Store the generated token value in an environment variable named, APP_TOKEN.  Note Replace the APP_TOKEN value in the example with the one generated above.   Example: $ export APP_TOKEN="hvs.BMXSIJvlm6OjYeWiBmkLxnhgkPAkr3Lx8CbvU1WRnCGTwufIGicKImh2cyDYN0hhaWJIcE5yQUlRWGMxYzZFc05DcDUuWFA1T2oQjQI"
-16.     
-17. Access the secrets at secret/test/webapp authenticated with the APP_TOKEN. $ VAULT_TOKEN=$APP_TOKEN vault kv get secret/test/webapp
-18. 
-19.  ====== Metadata ======
-20.  Key              Value
-21.  ---              -----
-22.  created_time     2021-06-17T03:06:34.063027186Z
-23.  deletion_time    n/a
-24.  destroyed        false
-25.  version          1
-26. 
-27.  ===== Data =====
-28.  Key        Value
-29.  ---        -----
-30.  api-key    ABC0DEFG9876
-31.    Copy   
+
+To login, use the auth/approle/login endpoint by passing the RoleID and SecretID.  Note Replace the role_id and secret_id values in the example with those generated in the Generate RoleID and SecretID section above.   Example: $ vault write auth/approle/login \
+
+role_id="675a50e7-cfe0-be76-e35f-49ec009731ea" \
+
+secret_id="ed0a642f-2acf-c2da-232f-1b21300d5f29"
+     Example output: Key                     Value
+  ---                     -----
+ token                   hvs.BMXSIJvlm6OjYeWiBmkLxnhgkPAkr3Lx8CbvU1WRnCGTwufIGicKImh2cyDYN0hhaWJIcE5yQUlRWGMxYzZFc05DcDUuWFA1T2oQjQI
+
+token_accessor          FILPoDWPoqd5zeo62HAoWexN.0YFbA
+
+token_duration          1h
+
+ token_renewable         true
+
+ token_policies          ["default" "tester"]
+
+ identity_policies       []
+
+ policies                ["default" "tester"]
+
+ token_meta_role_name    webapp
+
+     Vault returns a client token with default and tester policies attached.
+     
+     Store the generated token value in an environment variable named, APP_TOKEN.  Note Replace the APP_TOKEN value in the example with the one generated above.   Example: $ export APP_TOKEN="hvs.BMXSIJvlm6OjYeWiBmkLxnhgkPAkr3Lx8CbvU1WRnCGTwufIGicKImh2cyDYN0hhaWJIcE5yQUlRWGMxYzZFc05DcDUuWFA1T2oQjQI"
+
+Access the secrets at secret/test/webapp authenticated with the APP_TOKEN. $ VAULT_TOKEN=$APP_TOKEN vault kv get secret/test/webapp
+ 
+  ====== Metadata ======
+  Key              Value
+  ---              -----
+ created_time     2021-06-17T03:06:34.063027186Z
+
+ deletion_time    n/a
+
+ destroyed        false
+
+ version          1
+ 
+  ===== Data =====
+
+ Key        Value
+
+ ---        -----
+api-key    ABC0DEFG9876
+
 To learn more about the Key/Value v2 secrets engine, read the Versioned Key/Value Secrets Engine tutorial.
 
 Next steps
+
 To learn more about the AppRole auth method, refer to the AppRole Pull Authentication and AppRole with Terraform & Chef tutorials.
+
 If you followed the tutorials all the way through, you completed the common Vault operations workflow.
 ￼
 The differences between the HCP Vault and self-managed Vault are:
-* HCP Vault runs Vault Enterprise
-* The root namespace of HCP Vault is admin
+
+HCP Vault runs Vault Enterprise
+
+The root namespace of HCP Vault is admin
+
 You can follow any of the Vault tutorials on Learn. Your VAULT_ADDR and VAULT_TOKEN values are different from what the tutorials may say, but you know how to set them for your HCP Vault cluster. In addition, be sure to set VAULT_NAMESPACE.
+
 Next, continue onto the Vault Operations Tasks tutorial which demonstrates the cluster-level operations.
 
 Clean up
+
 If you wish to delete the resources you created to clean up your Vault environment, go through the steps in this section.
-1. Disable the AppRole auth method enabled at approle. $ vault auth disable approle
-2.  Success! Disabled the auth method (if it existed) at: approle/
-3.    Copy   
-4. Delete the tester policy. $ vault policy delete tester
-5.  Success! Deleted policy: tester
-6.    Copy   
-7. Disable the key/value v2 secrets engine at secret/. $ vault secrets disable secret
-8.  Success! Disabled the secrets engine (if it existed) at: secret/
-9.    Copy   
-10. Delete the education/training namespace. $ vault namespace delete -namespace=admin/education training
-11. 
-12.  WARNING! The following warnings were returned from Vault:
-13. 
-14.    * Namespace deletion has been queued. Progress will be reported in
-15.    debug-level logs in Vault's server log.
-16.    Copy   
-17. Delete the education namespace. $ vault namespace delete education
-18. 
-19.  WARNING! The following warnings were returned from Vault:
-20. 
-21.    * Namespace deletion has been queued. Progress will be reported in
-22.    debug-level logs in Vault's server log.
-23.    Copy   
-24. Delete the stored token. $ unset VAULT_TOKEN
-25. 
+
+Disable the AppRole auth method enabled at approle. $ vault auth disable approle
+
+Success! Disabled the auth method (if it existed) at: approle/
+
+Delete the tester policy. $ vault policy delete tester
+
+Success! Deleted policy: tester
+
+Disable the key/value v2 secrets engine at secret/. $ vault secrets disable secret
+
+Success! Disabled the secrets engine (if it existed) at: secret/
+     
+
+Delete the education/training namespace. $ vault namespace delete -namespace=admin/education training
+
+WARNING! The following warnings were returned from Vault:
+
+Namespace deletion has been queued. Progress will be reported in
+
+debug-level logs in Vault's server log.
+
+Delete the education namespace. $ vault namespace delete education
+
+ WARNING! The following warnings were returned from Vault:
+
+Namespace deletion has been queued. Progress will be reported in
+
+debug-level logs in Vault's server log.
+   
+Delete the stored token. $ unset VAULT_TOKEN
+ 
 HCP Vault operation tasks
-* 		9min|HCP HCP Vault  Vault
 
 HashiCorp Cloud Platform (HCP) Vault provides access to critical operational tasks, such as locking the cluster, accessing audit logs, and managing data snapshots.
+
 In this tutorial, you will perform these operational tasks.
 
 Note
+
 This tutorial assumes that you created and connected to the HCP Vault cluster in the Create a Vault Cluster on HashiCorp Cloud Platform (HCP) tutorial.
 
 Lock and unlock the Vault cluster
+
 Intrusion detection or data breaches may require you to lock your HCP Vault cluster. API lock functions similarly to Vault sealing by preventing normal Vault operations but still allowing the HCP platform access to perform upgrades and snapshots.
 
 Warning
 Locking a cluster prevents customer access to the cluster until it is unlocked.
 
 Lock the cluster
-1. Under Quick actions, click API Lock.
+
+Under Quick actions, click API Lock.
 ￼
-2.  A Lock API? pop-up dialog displays a warning and explanation of the locking operation.
-3. Enter LOCK into the Confirm lock field.
+ A Lock API? pop-up dialog displays a warning and explanation of the locking operation.
+
+Enter LOCK into the Confirm lock field.
 ￼
-4. 
-5. Click Lock to proceed. When it completes, the cluster state changes to Locked.
-￼
-6. 
+Click Lock to proceed. When it completes, the cluster state changes to Locked.
+ 
 
 Unlock the cluster
-1. In the Vault cluster is locked notification, click Unlock. A pop-up dialog displays a warning and explanation of the unseal operation. 
+
+In the Vault cluster is locked notification, click Unlock. A pop-up dialog displays a warning and explanation of the unseal operation. 
 ￼
-2. 
-3. Enter UNLOCK into the Confirm unlock field.
-4. Click Unlock.
+Enter UNLOCK into the Confirm unlock field.
+
+Click Unlock.
+
 The Vault cluster unlocks. The Vault Overview page displays the Vault configuration and available operations.
 
 Scale an HCP Vault cluster up or down
 
 Note
+
 Scaling your HCP Vault cluster to a higher tier will increase the hourly charges for your HCP account. Please review carefully before committing any changes to your HCP Vault cluster.
+
 HCP Vault cluster scaling allows you to scale your cluster up or down to meet organizational needs. You can scale between both cluster tiers (e.g. dev to starter, starter to standard) and cluster sizes (e.g standard small to standard medium).
 
 Note
+
 HCP Vault clusters can be scaled up from the development tier to a larger tier, however starter, standard, or plus tier clusters cannot be scaled down to the development tier.
-Cluster scaling is fully managed by the HashiCorp Cloud Platform and performed with no downtime, meaning you can continue to utilize HCP Vault while the cluster is being scaled up or down. Cluster scaling is available from the HCP Portal and Terraform when using version 0.21.1 or higher of the HCP Terraform provider.
+
+Cluster scaling is fully managed by the HashiCorp Cloud Platform and performed with no downtime, meaning you can continue to utilize HCP Vault while the 
+
+cluster is being scaled up or down. Cluster scaling is available from the HCP Portal and Terraform when using version 0.21.1 or higher of the HCP Terraform provider.
+
 Follow these steps in the HCP Portal to scale your cluster up from the dev tier cluster created in the Create a Vault Cluster on HCP tutorial.
-1. Navigate to the Overview page for your HCP Vault cluster.
-2. Click Manage and then select Edit configuration.
-3. Scroll down to view the Cluster Tier section.
+
+Navigate to the Overview page for your HCP Vault cluster.
+
+Click Manage and then select Edit configuration.
+
+Scroll down to view the Cluster Tier section.
+￼ 
+Click the radio button for the Standard tier. In the Cluster Size section you will see multiple supported sizes. You can scale the HCP Vault cluster up and down between the available sizes within a tier, or scale between different tiers. You can scale up from the Development tier to another tier but you cannot scale back down to the Development tier.
+
+Click the radio button for the Starter tier. In the Cluster Size section Small is the only size available in this tier.
+
+Click Next.
+
+The Review changes screen provides an overview of the requested changes and the pricing differences between the two tiers.
 ￼
-4. 
-5. Click the radio button for the Standard tier. In the Cluster Size section you will see multiple supported sizes. You can scale the HCP Vault cluster up and down between the available sizes within a tier, or scale between different tiers. You can scale up from the Development tier to another tier but you cannot scale back down to the Development tier.
-6. Click the radio button for the Starter tier. In the Cluster Size section Small is the only size available in this tier.
-7. Click Next.
-8. The Review changes screen provides an overview of the requested changes and the pricing differences between the two tiers.
-￼
-9. 
-10. Click Apply changes. You will be returned to the Overview screen.
-11. The cluster will begin updating. This process will take several minutes.  Note If the cluster status section displays the status as Running, refresh the browser window/tab.  
+
+Click Apply changes. You will be returned to the Overview screen.
+
+The cluster will begin updating. This process will take several minutes.  Note If the cluster status section displays the status as Running, refresh the browser window/tab.  
+
 Wait for the cluster to complete the scale up process and then move on to the next section.
 
 Data snapshots
+
 Preserving Vault data is critical to production operations and particularly for disaster or sabotage recovery purposes. HCP Vault offers snapshot functionality for the underlying storage to preserve data based on your requirements.
 
 Note
+
 Snapshots are not available for development tier clusters.
 
 Create snapshot
+
 After completing the Scale an HCP Vault cluster up or down tutorial you can follow these steps to manually snapshot your Vault data as needed.
-1. Click Snapshots in the left navigation pane.
+
+Click Snapshots in the left navigation pane.
 ￼
-2.  The view displays a history of the snapshots created.
-3. Click Create snapshot.
+ The view displays a history of the snapshots created.
+
+Click Create snapshot.
 ￼
-4.  A Create snapshot pop-up dialog displays.
-5. Enter tutorial in the Snapshot name field and click Create snapshot. The view displays the snapshot history. The latest snapshot is appended to the snapshot list. While the snapshot is in progress it will display a Pending animation in the Status column.
+ A Create snapshot pop-up dialog displays.
+
+Enter tutorial in the Snapshot name field and click Create snapshot. The view displays the snapshot history. The latest snapshot is appended to the snapshot list. While the snapshot is in progress it will display a Pending animation in the Status column.
 ￼
-6.   Note The duration of time needed for the snapshot to complete can vary and largely depends on the size the of data stored in your Vault cluster.   When the snapshot operation completes the Status changes to Stored.  Note HCP persists the snapshots for up to 30 days after creation, checks every 24 hours, and prunes expired snapshots.  
+  Note The duration of time needed for the snapshot to complete can vary and largely depends on the size the of data stored in your Vault cluster.   When the snapshot operation completes the Status changes to Stored.  Note HCP persists the snapshots for up to 30 days after creation, checks every 24 hours, and prunes expired snapshots.  
 
 Restore snapshot
+
 You can use the snapshots to restore data if it ever becomes necessary.
-1. Click the Snapshots link in the left navigation pane.
-2. Click the ellipsis (...) menu next to the tutorial snapshot entry, and choose Restore.
-￼
-3. 
-4. A confirmation dialog appears; enter RESTORE and click Restore snapshot to confirm restoration. A message will appear informing you the restore process has started.
-￼
-5. 
+
+Click the Snapshots link in the left navigation pane.
+
+Click the ellipsis (...) menu next to the tutorial snapshot entry, and choose Restore.
+￼ 
+A confirmation dialog appears; enter RESTORE and click Restore snapshot to confirm restoration. A message will appear informing you the restore process has started.
+ 
 
 Delete snapshot
-1. Click the Snapshots link in the left navigation pane.
-2. Click the ellipsis (...) menu next to the tutorial snapshot, and choose Delete.
-￼
-3. 
-4. A confirmation dialog appears; enter DELETE and click Delete snapshot to confirm snapshot deletion.
-5. A Snapshot deleting dialog appears. Once the snapshot is deleted, it no longer appears in the snapshot list.
+
+Click the Snapshots link in the left navigation pane.
+
+Click the ellipsis (...) menu next to the tutorial snapshot, and choose Delete.
+￼ 
+A confirmation dialog appears; enter DELETE and click Delete snapshot to confirm snapshot deletion.
+
+A Snapshot deleting dialog appears. Once the snapshot is deleted, it no longer appears in the snapshot list.
 
 Access the audit log for troubleshooting
 
 Note
+
 Audit logging is not available on Development tier clusters.
+
 Effective troubleshooting of requests and responses to Vault requires access to the audit device logs.
+
 HCP Vault enables a File Audit Device by default. This device provides the last hour of Vault requests in a downloadable archive. These logs may be imported into your preferred tooling for auditing and troubleshooting.
-1. From the Vault cluster overview page, click Audit Logs.
-2. From the Audit logs page, click Select logs in the Download audit logs box. 
+
+From the Vault cluster overview page, click Audit Logs.
+
+From the Audit logs page, click Select logs in the Download audit logs box. 
 ￼
-3.  A Download audit logs pop-up dialog displays.
-4. Use the Start date and Start time components to specify the audit log starting position. The log file will cover a 1 hour period after the date and time that you select.
+ A Download audit logs pop-up dialog displays.
+
+Use the Start date and Start time components to specify the audit log starting position. The log file will cover a 1 hour period after the date and time that you select.
 ￼
-5. 
-6. Once you have selected the desired Start date and Start time, click Generate logs. When the archive is created, a new Download audit logs pop-up dialog displays. The archive is presented with the specific time-frame covered by the log file.  Note The file is only available to download for 10 minutes; after this time elapses, you must begin the download process from the first step.  
-7. Click the download icon.
+Once you have selected the desired Start date and Start time, click Generate logs. When the archive is created, a new Download audit logs pop-up dialog displays. The archive is presented with the specific time-frame covered by the log file.  Note The file is only available to download for 10 minutes; after this time elapses, you must begin the download process from the first step.  
+
+Click the download icon.
 ￼
-8.  The downloaded file is a gzip compressed file. The filename contains the start and end timestamps as part of its filename (e.g. auditlogs-vault-cluster-202102021400-202102021500.gz). Refer to the HCP Vault Monitoring tutorial collection to learn how to stream audit logs to Datadog, Grafana Cloud, or Splunk. 
+ The downloaded file is a gzip compressed file. The filename contains the start and end timestamps as part of its filename (e.g. auditlogs-vault-cluster-202102021400-202102021500.gz). Refer to the HCP Vault Monitoring tutorial collection to learn how to stream audit logs to Datadog, Grafana Cloud, or Splunk. 
 
 Manage major version upgrades
+
 There are scenarios where major version upgrades of the Vault cluster can potentially affect the behavior of Vault clients. For example, the returned JSON output may contain a new field. These changes may require additional testing or operational updates to leverage the enhanced behaviors.
+
 Customers running HCP Vault on either the Standard or Plus tiers can manage when the Vault cluster will be upgraded.
 
 Note
+
 Major version upgrade settings are available on either the Standard or Plus tier. If you would like to follow this tutorial, upgrade your Vault cluster to the Standard or Plus tier.
-1. Log into the HCP Portal and navigate to the Vault Overview page.
+
+Log into the HCP Portal and navigate to the Vault Overview page.
+￼ 
+Click the cluster ID link for a HCP Vault cluster that is on the Standard or Plus tier.
 ￼
-2. 
-3. Click the cluster ID link for a HCP Vault cluster that is on the Standard or Plus tier.
+From the Vault cluster Overview page, click Settings.
 ￼
-4. 
-5. From the Vault cluster Overview page, click Settings.
+Click Edit settings.
+
+You can choose between three options to control when your cluster will be upgrade. Automatic will upgrade the cluster as new versions of Vault are validated for HCP. Scheduled allows you select a day and time window in which the upgrade will be performed. Manual allows you to initiate the upgrade on any day or time of your choosing, but will be automatically upgraded after 30 days.
+
+Select Manual and click Apply changes.  Note The remainder of these steps are for demonstration purposes only. You can follow these steps after a new version of Vault becomes available.  
+
+Click Overview.
+
+When a cluster is set to manual, and a new upgrade is detected, you will receive a notification that an upgrade is available with a Upgrade now button.
 ￼
-6. 
-7. Click Edit settings.
-8. You can choose between three options to control when your cluster will be upgrade. Automatic will upgrade the cluster as new versions of Vault are validated for HCP. Scheduled allows you select a day and time window in which the upgrade will be performed. Manual allows you to initiate the upgrade on any day or time of your choosing, but will be automatically upgraded after 30 days.
-9. Select Manual and click Apply changes.  Note The remainder of these steps are for demonstration purposes only. You can follow these steps after a new version of Vault becomes available.  
-10. Click Overview.
-11. When a cluster is set to manual, and a new upgrade is detected, you will receive a notification that an upgrade is available with a Upgrade now button.
+ HCP Portal users will also receive an email notification that the upgrade is available.
 ￼
-12.  HCP Portal users will also receive an email notification that the upgrade is available.
+Click Upgrade now. A dialog will appear with a link to the changelog and upgrade guide so you can review any changes that may impact your usage of HCP Vault.
 ￼
-13. 
-14. Click Upgrade now. A dialog will appear with a link to the changelog and upgrade guide so you can review any changes that may impact your usage of HCP Vault.
+Click Upgrade now to begin the automated upgrade process.
 ￼
-15. 
-16. Click Upgrade now to begin the automated upgrade process.
+When the upgrade process completes, a new notification will appear with a link to the release notes.
 ￼
-17. 
-18. When the upgrade process completes, a new notification will appear with a link to the release notes.
-￼
-19.  HCP Portal users will also receive an email notification that the upgrade is complete.
+ HCP Portal users will also receive an email notification that the upgrade is complete.
 
 
