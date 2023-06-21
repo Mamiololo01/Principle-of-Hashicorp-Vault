@@ -40,20 +40,18 @@ S
 entinel	Available with license	Available with HCP Vault Plus.
 
 Create a Vault cluster on HCP
-* 		4min|HCP HCP Vault  Vault
 
 HashiCorp Cloud Platform (HCP) Vault enables you to quickly deploy a Vault Enterprise cluster in a supported public cloud provider. As a fully managed service, it allows you to leverage Vault as a central secret management service while offloading the operational burden to the Site Reliability Engineering (SRE) experts at HashiCorp.
+
 In this tutorial, you will deploy a Vault Enterprise cluster guided by the HCP portal.
 
 Prerequisites
+
 You will need an HCP account.
 
-Note
 Previous experience with Vault and Vault Enterprise are not required to deploy a Vault server in HCP.
 
 Create a Vault cluster
-
-Note
 
 This tutorial assumes you have not previously created HashiCorp Virtual Network (HVN) in your HashiCorp Cloud Platform account.
 
@@ -86,9 +84,6 @@ Wait for the cluster to initialize before proceeding.
 Vault cluster overview
 
 The Vault page displays the created Vault cluster. Within that view, the Overview page displays information to help you learn about HCP Vault, Vault configuration, Vault usage, and cluster details. The Access Vault pane contains details that enable you to administer the Vault cluster through the Web UI or command-line interface (CLI).
-￼
-
-Note
 
 The cluster is created with a top-level Namespace called admin. Namespaces enable you to create isolated Vault environments.
 
@@ -131,18 +126,18 @@ Click Sign In.
 ￼
 Notice that your current namespace is admin/.
 
-
 Multi-tenancy with Namespaces
 
 When Vault is primarily used as a central location to manage secrets, multiple organizations within a company may need to be able to manage their secrets in a self-serving manner. This means that a company needs to implement a Vault as a Service model allowing each organization (tenant) to manage their own secrets and policies. Most importantly, tenants should be restricted to work only within their tenant scope.
 ￼
 To achieve this, HashiCorp Cloud Platform (HCP) Vault utilizes the concept of a namespace. A namespace allows you to create separate groups of secrets, and apply policies to those namespaces to ensure each tenant can only access the secrets they have permission to. When you create a new HCP Vault cluster, a Vault Enterprise cluster with a default namespace of admin is provisioned.
+
 In this tutorial, you will explore the creation of namespaces and learn how to navigate between them.
 
-Note
 This step assumes that you created and connected to the HCP Vault cluster in the Create a Vault Cluster on HashiCorp Cloud Platform (HCP) step.
 
 Characteristics of Vault namespaces
+
 A Vault namespace enables teams, organizations, or applications a dedicated, isolated environment. Each namespace has its own:
 
 Policies
@@ -223,8 +218,6 @@ put	x	x	Sets or update secrets (this replaces existing secrets)
 rollback		x	Rolls back to a previous version of secrets
 
 undelete		x	Restore the deleted version of secrets
-
-
 
 Enable secrets engine
 
@@ -342,8 +335,6 @@ Before a client can interact with Vault, it must authenticate against an auth m
 
 In this tutorial, you will enable and configure AppRole auth method.
 
-Note
-
 As with secrets engines and policies, auth methods are tied to a namespace. The auth method enabled on the admin namespace is only available to the admin namespace and generates a token available to use against the admin namespace.
 
 Personas
@@ -354,7 +345,6 @@ admin - Vault admin with privileged permissions to configure an auth method
 
 app - Vault client that consumes secrets stored in Vault
 
-Note
 
 This step assumes that you created and connected to the HCP Vault cluster in the Create a Vault Cluster on HashiCorp Cloud Platform (HCP) step, and completed the Create Vault Policies tutorial so the tester policy exists.
 
@@ -393,6 +383,7 @@ Paste the command into the command shell in the browser and press the enter butt
  
 
 Generate RoleID and SecretID
+
 (Persona: admin)
 
 The RoleID and SecretID are like a username and password that a machine or app uses to authenticate.
@@ -408,22 +399,28 @@ Read the RoleID. $ vault read auth/approle/role/webapp/role-id
  role_id b6ccdcca-183b-ce9c-6b98-b556b9a0edb9
 
 Generate a new SecretID of the webapp role. $ vault write -force auth/approle/role/webapp/secret-id
-7.    Copy    Key                Value
-8.  secret_id          735a47cc-7a98-77cc-0128-12b1e96a4157
-9.  secret_id_accessor 3ab305d1-1eab-df4b-4079-ef7135635c49
-10.  ...snip...
-11.      The -force (or -f) flag forces the write operation to continue without any data values specified. Or you can set parameters such as cidr_list. 
+
+Copy    Key                Value
+
+secret_id          735a47cc-7a98-77cc-0128-12b1e96a4157
+
+secret_id_accessor 3ab305d1-1eab-df4b-4079-ef7135635c49
+
+The -force (or -f) flag forces the write operation to continue without any data values specified. Or you can set parameters such as cidr_list. 
 ￼
-12.  The acquired role-id and secret-id are the credentials that your trusted application uses to authenticate with Vault.
+ The acquired role-id and secret-id are the credentials that your trusted application uses to authenticate with Vault.
 
 Tip
 The RoleID is similar to a username; therefore, you will get the same value for a given role. In this case, the webapp role has a fixed RoleID. While SecretID is similar to a password that Vault will generate a new value every time you request it.
 
 Test and validate
+
 (Persona: app)
+
 The client (in this case, webapp) uses the RoleID and SecretID passed by the admin to authenticate with Vault. If webapp did not receive the RoleID and/or SecretID, the admin needs to investigate.
 
 Tip
+
 Refer to the Advanced Features section for further discussion on distributing the RoleID and SecretID to the client app securely.
 
 To login, use the auth/approle/login endpoint by passing the RoleID and SecretID.  Note Replace the role_id and secret_id values in the example with those generated in the Generate RoleID and SecretID section above.   Example: $ vault write auth/approle/login \
@@ -431,9 +428,11 @@ To login, use the auth/approle/login endpoint by passing the RoleID and Secret
 role_id="675a50e7-cfe0-be76-e35f-49ec009731ea" \
 
 secret_id="ed0a642f-2acf-c2da-232f-1b21300d5f29"
-     Example output: Key                     Value
+
+     Example output: Key                     Value
   ---                     -----
- token                   hvs.BMXSIJvlm6OjYeWiBmkLxnhgkPAkr3Lx8CbvU1WRnCGTwufIGicKImh2cyDYN0hhaWJIcE5yQUlRWGMxYzZFc05DcDUuWFA1T2oQjQI
+ 
+ token                   hvs.BMXSIJvlm6OjYeWiBmkLxnhgkPAkr3Lx8CbvU1WRnCGTwufIGicKImh2cyDYN0hhaWJIcE5yQUlRWGMxYzZFc05DcDUuWFA1T2oQjQI
 
 token_accessor          FILPoDWPoqd5zeo62HAoWexN.0YFbA
 
@@ -449,9 +448,9 @@ token_duration          1h
 
  token_meta_role_name    webapp
 
-     Vault returns a client token with default and tester policies attached.
+ Vault returns a client token with default and tester policies attached.
      
-     Store the generated token value in an environment variable named, APP_TOKEN.  Note Replace the APP_TOKEN value in the example with the one generated above.   Example: $ export APP_TOKEN="hvs.BMXSIJvlm6OjYeWiBmkLxnhgkPAkr3Lx8CbvU1WRnCGTwufIGicKImh2cyDYN0hhaWJIcE5yQUlRWGMxYzZFc05DcDUuWFA1T2oQjQI"
+ Store the generated token value in an environment variable named, APP_TOKEN.  Note Replace the APP_TOKEN value in the example with the one generated above.   Example: $ export APP_TOKEN="hvs.BMXSIJvlm6OjYeWiBmkLxnhgkPAkr3Lx8CbvU1WRnCGTwufIGicKImh2cyDYN0hhaWJIcE5yQUlRWGMxYzZFc05DcDUuWFA1T2oQjQI"
 
 Access the secrets at secret/test/webapp authenticated with the APP_TOKEN. $ VAULT_TOKEN=$APP_TOKEN vault kv get secret/test/webapp
  
@@ -518,7 +517,7 @@ debug-level logs in Vault's server log.
 
 Delete the education namespace. $ vault namespace delete education
 
- WARNING! The following warnings were returned from Vault:
+WARNING! The following warnings were returned from Vault:
 
 Namespace deletion has been queued. Progress will be reported in
 
@@ -532,8 +531,6 @@ HashiCorp Cloud Platform (HCP) Vault provides access to critical operational tas
 
 In this tutorial, you will perform these operational tasks.
 
-Note
-
 This tutorial assumes that you created and connected to the HCP Vault cluster in the Create a Vault Cluster on HashiCorp Cloud Platform (HCP) tutorial.
 
 Lock and unlock the Vault cluster
@@ -541,7 +538,10 @@ Lock and unlock the Vault cluster
 Intrusion detection or data breaches may require you to lock your HCP Vault cluster. API lock functions similarly to Vault sealing by preventing normal Vault operations but still allowing the HCP platform access to perform upgrades and snapshots.
 
 Warning
-Locking a cluster prevents customer access to the cluster until it is unlocked.
+
+Locking a cluster prevents customer access to the cluster u
+
+ntil it is unlocked.
 
 Lock the cluster
 
@@ -553,7 +553,6 @@ Enter LOCK into the Confirm lock field.
 ￼
 Click Lock to proceed. When it completes, the cluster state changes to Locked.
  
-
 Unlock the cluster
 
 In the Vault cluster is locked notification, click Unlock. A pop-up dialog displays a warning and explanation of the unseal operation. 
@@ -566,13 +565,9 @@ The Vault cluster unlocks. The Vault Overview page displays the Vault configur
 
 Scale an HCP Vault cluster up or down
 
-Note
-
 Scaling your HCP Vault cluster to a higher tier will increase the hourly charges for your HCP account. Please review carefully before committing any changes to your HCP Vault cluster.
 
 HCP Vault cluster scaling allows you to scale your cluster up or down to meet organizational needs. You can scale between both cluster tiers (e.g. dev to starter, starter to standard) and cluster sizes (e.g standard small to standard medium).
-
-Note
 
 HCP Vault clusters can be scaled up from the development tier to a larger tier, however starter, standard, or plus tier clusters cannot be scaled down to the development tier.
 
@@ -606,8 +601,6 @@ Wait for the cluster to complete the scale up process and then move on to the ne
 Data snapshots
 
 Preserving Vault data is critical to production operations and particularly for disaster or sabotage recovery purposes. HCP Vault offers snapshot functionality for the underlying storage to preserve data based on your requirements.
-
-Note
 
 Snapshots are not available for development tier clusters.
 
@@ -649,8 +642,6 @@ A confirmation dialog appears; enter DELETE and click Delete snapshot to con
 A Snapshot deleting dialog appears. Once the snapshot is deleted, it no longer appears in the snapshot list.
 
 Access the audit log for troubleshooting
-
-Note
 
 Audit logging is not available on Development tier clusters.
 
